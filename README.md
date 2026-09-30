@@ -59,24 +59,24 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Searches the listings for description keywords, applies an optional size and inclusive price ceiling, and ranks matching items by relevance.
+- **Inputs:** `description` (`str`); `size` (`str | None`, optional); `max_price` (`float | None`, optional). Size matching is case-insensitive and matches a complete size label or slash-separated component (so `M` matches `S/M` but `L` does not match `XL`); it does not use substring matches.
+- **Returns:** Up to `SEARCH_RESULT_LIMIT` matching listing dictionaries, best match first. Each dictionary contains `id`, `title`, `description`, `category`, `style_tags`, `size`, `condition`, `price`, `colors`, `brand`, and `platform`; `brand` may be `None`.
+- **When it has nothing:** Returns an empty list (`[]`) when no listings match.
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Suggests one or two outfits combining the item being considered with pieces in the user's wardrobe.
+- **Inputs:** `new_item` (listing `dict`); `wardrobe` (`dict` with an `items` list of wardrobe-item dictionaries).
+- **Returns:** A non-empty `str` containing outfit suggestions; when the wardrobe has items, suggestions name pieces the user owns.
+- **When it has nothing:** If `wardrobe["items"]` is empty, returns general styling advice for `new_item` as a non-empty string.
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Writes a short, social-media-style caption about the item and its outfit suggestion.
+- **Inputs:** `outfit` (`str`); `new_item` (listing `dict`).
+- **Returns:** A two-to-four-sentence `str` caption that mentions the item, its price, and its platform once each, and describes its vibe.
+- **When it has nothing:** If `outfit` is empty or whitespace, returns a descriptive fallback string instead of raising an error.
 
 ---
 
