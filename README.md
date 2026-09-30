@@ -59,7 +59,7 @@
 
 ### `search_listings`
 
-- **What it does:** Searches the listings for description keywords, applies an optional size and inclusive price ceiling, and ranks matching items by relevance.
+- **What it does:** Searches listings using the request's description keywords, applies an optional size and inclusive price ceiling, then ranks matches by counting case-insensitive query-word matches in each listing's `title`, `description`, and `style_tags`; listings with zero matches are excluded and ties keep the original data order.
 - **Inputs:** `description` (`str`); `size` (`str | None`, optional); `max_price` (`float | None`, optional). Size matching is case-insensitive and matches a complete size label or slash-separated component (so `M` matches `S/M` but `L` does not match `XL`); it does not use substring matches.
 - **Returns:** Up to `SEARCH_RESULT_LIMIT` matching listing dictionaries, best match first. Each dictionary contains `id`, `title`, `description`, `category`, `style_tags`, `size`, `condition`, `price`, `colors`, `brand`, and `platform`; `brand` may be `None`.
 - **When it has nothing:** Returns an empty list (`[]`) when no listings match.
@@ -78,6 +78,8 @@
 - **Returns:** A two-to-four-sentence `str` caption that mentions the item, its price, and its platform once each, and describes its vibe.
 - **When it has nothing:** If `outfit` is empty or whitespace, returns a descriptive fallback string instead of raising an error.
 
+**Spec check:** Could another person implement these tools without asking for clarification? The search fields, matching rule, ranking rule, tie behavior, return shape, and empty cases are specified above.
+
 ---
 
 ## Planning Loop
@@ -93,13 +95,13 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:** If `search_listings` returns an empty list, set `session["error"]` to a helpful message suggesting the user change their keywords, size, or price limit, then return the session without calling `suggest_outfit`. Otherwise, save the results in `session["search_results"]`, select the first result into `session["selected_item"]`, and continue to `suggest_outfit`.
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+**How the query is parsed:** Use regular expressions to extract an optional `size ...` value and optional `under $...` price ceiling; use the remaining words as the description passed to `search_listings`.
 
-**What moves through the session:** <!-- which fields, in what order -->
+**What moves through the session:** `query` and `wardrobe` are initialized first; parsed `description`, `size`, and `max_price` go in `session["parsed"]`; `search_listings` fills `session["search_results"]`; the first result goes in `session["selected_item"]`; then `suggest_outfit` fills `session["outfit_suggestion"]` and `create_fit_card` fills `session["fit_card"]`. If there are no results, `session["error"]` is set and the later fields remain empty.
 
 ---
 
