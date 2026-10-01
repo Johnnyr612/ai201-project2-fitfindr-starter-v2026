@@ -115,7 +115,21 @@
 **One full query**
 
 ```
-$ python app.py ask '...'
+$ python app.py ask 'vintage graphic tee under $30'
+
+  Found:    Y2K Baby Tee — Butterfly Print — $18.0 on depop
+
+  Outfit:   Here are two outfit ideas featuring the **Y2K Baby Tee — Butterfly Print**:
+
+**1. Ultimate Y2K Streetwear**
+Pair the baby tee with the **Baggy straight-leg jeans, dark wash** for a classic early-2000s proportion play. Layer the **Vintage black denim jacket** on top and finish with the **Chunky white sneakers** and **Black crossbody bag**.
+
+**2. Edgy Contrast**
+Style the cropped baby tee with the **Wide-leg khaki trousers**. Add the **Black combat boots** to ground the softer pink and purple tones of the butterfly graphic, and accessorize with the **Black crossbody bag**.
+
+  Fit card: Channel your inner early 2000s icon by pairing this Y2K Baby Tee — Butterfly Print with baggy straight-leg jeans and chunky white sneakers for the ultimate throwback streetwear vibe. It's listed on depop for just $18.00 and ready to upgrade your rotation. Grab it before it's gone!
+
+2 model calls this session, 1540 prompt + 207 output tokens
 
 ```
 
@@ -123,17 +137,17 @@ $ python app.py ask '...'
 
 ```
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
-
+[('lst_002', 'Y2K Baby Tee — Butterfly Print', 18.0), ('lst_006', 'Graphic Tee — 2003 Tour Bootleg Style', 24.0), ('lst_017', 'Mesh Long-Sleeve Top — Black', 15.0), ('lst_033', 'Vintage Band Tee — Faded Grey', 19.0), ('lst_011', 'Low-Rise Cargo Pants — Khaki', 27.0), ('lst_015', 'Vintage Graphic Hoodie — Faded Black', 26.0)]
 ```
 
 ```
-$ python -c "from tools import suggest_outfit; ..."
-
+$ python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(' '.join(suggest_outfit(load_listings()[0], get_example_wardrobe()).split()))"
+Here are two ways to style your new Vintage Levi's 501 Jeans: **Outfit 1: Casual Streetwear** * **Top:** White ribbed tank top * **Outerwear:** Vintage black denim jacket* **Shoes:** Chunky white sneakers * **Accessories:** Black crossbody bag **Outfit 2: Cozy & Classic** * **Top:**Oversized grey crewneck sweatshirt * **Accessories:** Brown leather belt * **Shoes:** Black combat boots
 ```
 
 ```
-$ python -c "from tools import create_fit_card; ..."
-
+$ python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(' '.join(create_fit_card('jeans with white sneakers', load_listings()[0]).split()))"
+Nothing beats the character of broken-in denim, especially when it comes with that effortless 90s street style vibe. Throw on your favorite jeans with white sneakers and you've got an instantly cool, everyday look ready to go. Grab these Vintage Levi's 501 Jeans — Medium Wash for just $38.0 up on depop before someone else snags them!
 ```
 
 ---
