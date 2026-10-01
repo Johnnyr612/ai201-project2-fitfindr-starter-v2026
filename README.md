@@ -39,9 +39,11 @@
 
 ## What This Does
 
-<!-- Three or four sentences: what a user asks for, and what they get back. -->
-
-
+FitFindr takes a natural-language request for secondhand clothing and searches
+local listings using the requested keywords, size, and price limit. For the
+best match, it uses AI to suggest outfits from the user's wardrobe and create a
+short fit-card caption. If nothing matches, it stops and tells the user what
+they could change in their search.
 
 ---
 
@@ -163,15 +165,24 @@ Nothing beats the character of broken-in denim, especially when it comes with th
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked Copilot to attack my acceptance criteria by
+     explaining how someone could test each one using only its wording.
+- *What came back:* It suggested checking whether the selected listing's ID
+     matches the ID passed to `suggest_outfit`, and counting the fit card's
+     sentences and required details.
+- *What I changed:* I made the state criterion observable: the selected item ID
+     must match the `new_item` ID received by `suggest_outfit` in 5 of 5 runs. I
+     also checked that handoff in my happy-path run.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked Copilot to read my no-match message as someone
+     unfamiliar with the app and say what they would try next.
+- *What came back:* It said the message gives three concrete options: change
+     the keywords, choose a different size, or raise the price limit.
+- *What I changed:* I kept those suggestions in `session["error"]` instead of
+     returning a vague "No results" message, then verified the empty-search path
+     leaves `session["fit_card"]` as `None`.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
