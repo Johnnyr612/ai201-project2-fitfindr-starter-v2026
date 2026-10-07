@@ -275,12 +275,12 @@ that produced it:
 
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
-
-
+**On the MCP move:** I registered `search_listings` in `mcp_server.py` with
+the README's typed inputs, then changed `agent.py::run_agent` to call it through
+`mcp_client.call_tool`. `python mcp_client.py` listed the tool and its schema,
+and `python app.py ask 'vintage graphic tee under $30'` completed successfully,
+finding the Y2K Baby Tee. The search result and downstream flow still worked;
+the run reported 0 model calls and 2 cache hits.
 
 ---
 
