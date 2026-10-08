@@ -4,9 +4,9 @@ A trace: a printed record of what your agent did, step by step, in order.
 Right now, when your agent does something strange, your only evidence is the
 final output. A trace turns that into a sequence you can point at.
 
-You'll add trace calls to your loop in unit 4, Milestone 2. The formatting is
-done for you here so you're not fighting alignment — what's yours is deciding
-*where* the calls go, which is the part that makes the trace worth reading.
+When `--trace` is enabled, the agent records each tool call here. The formatting
+is done for you so the trace shows the order and the values that explain the
+branch the agent took.
 
 Use it like this, inside `run_agent()`:
 
@@ -29,13 +29,21 @@ import config
 
 _lines: list[str] = []
 _step_number = 0
+_enabled = False
 
 
 def start_trace() -> None:
     """Clear the trace. Call this at the start of each run."""
-    global _step_number
+    global _enabled, _step_number
     _lines.clear()
     _step_number = 0
+    _enabled = True
+
+
+def stop_trace() -> None:
+    """Stop printing trace steps until the next call to start_trace()."""
+    global _enabled
+    _enabled = False
 
 
 def step(name: str, inputs=None, returned=None, note: str = "") -> None:
@@ -50,6 +58,9 @@ def step(name: str, inputs=None, returned=None, note: str = "") -> None:
         note:     an optional word on why, e.g. "branch: empty, stopping".
     """
     global _step_number
+    if not _enabled:
+        return
+
     _step_number += 1
 
     line = f"[{_step_number}] {name}"

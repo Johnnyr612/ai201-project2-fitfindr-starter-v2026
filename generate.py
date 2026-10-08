@@ -217,7 +217,10 @@ def _explain(exc: Exception) -> str:
         )
     if "connection" in message or "timeout" in message or "network" in message:
         return "Couldn't reach the model. Check your internet connection and try again."
-    return f"Couldn't reach the model: {exc}"
+    return (
+        f"Couldn't reach the model: {exc}. Check your API key or network "
+        "connection, then try again."
+    )
 
 
 def _retry_delay(exc: Exception, attempt: int) -> float:

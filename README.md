@@ -255,8 +255,7 @@ that produced it:
 
 <!-- One full run, printed step by step, with the MCP call visible in it.
 
-     `python app.py ask '...' --trace` once you've added the trace.step()
-     calls in Milestone 2.
+     `python app.py ask '...' --trace`
 
      Worth pasting BOTH the happy path and the empty-search path. The empty
      one should be visibly shorter, because it stops. If your two traces are
@@ -266,14 +265,40 @@ that produced it:
 **Happy path**
 
 ```
-
+$ python app.py ask 'vintage graphic tee under $30' --trace
+[1] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more
+[2] suggest_outfit
+      in:  dict with keys: item, wardrobe
+      out: Here are two ways to style the **Y2K Baby Tee — Butterfly Print**:  **1. Ultimate Y2K Streetwear** Pair the ba…
+[3] create_fit_card
+      in:  dict with keys: outfit, item
+      out: Channel your inner early 2000s pop star with this adorable Y2K Baby Tee — Butterfly Print, yours for just $18.…
 ```
 
 **Empty search**
 
 ```
+$ python app.py ask 'designer ballgown size XXS under $5' --trace
+[1] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+      →    branch: empty, stopping
 
+  No listings matched. Try different keywords, a different size, or a higher price limit.
 ```
+
+**Failure checks**
+
+- Empty search: stopped with “No listings matched. Try different keywords, a
+  different size, or a higher price limit.”
+- Empty wardrobe: with caching disabled, the tool returned general styling
+  advice for the Y2K Butterfly Baby Tee and continued to create a fit card.
+- Model unavailable: with an invalid key and caching disabled, the agent
+  stopped at `suggest_outfit` with “Outfit suggestion failed: The model
+  rejected your API key. Check GEMINI_API_KEY in your .env file, or create a
+  fresh key at aistudio.google.com.” No raw traceback was shown.
 
 **On the MCP move:** I registered `search_listings` in `mcp_server.py` with
 the README's typed inputs, then changed `agent.py::run_agent` to call it through

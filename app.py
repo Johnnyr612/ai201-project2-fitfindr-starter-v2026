@@ -127,6 +127,7 @@ def _ask_one(query, wardrobe, use_trace):
 
     if use_trace:
         text = trace_module.get_trace()
+        trace_module.stop_trace()
         if not text:
             print(
                 "  (--trace printed nothing. You haven't added trace.step() calls to\n"

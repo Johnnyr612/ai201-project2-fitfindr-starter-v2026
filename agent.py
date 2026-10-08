@@ -66,8 +66,6 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         the run ended early and the later fields will still be None.
 
     ─────────────────────────────────────────────────────────────────────────
-    TODO — build this, following the branch rule you wrote in Milestone 2.
-
       1. Start a session with new_session().
 
       2. Count the times round the loop, and call trace.check_iterations(count)
@@ -99,13 +97,6 @@ def run_agent(query: str, wardrobe: dict) -> dict:
       8. Return the session.
 
     ─────────────────────────────────────────────────────────────────────────
-    IN UNIT 4 you come back and add two things:
-
-      • Trace calls. One per step. `trace.step("search_listings", inputs=...,
-        returned=...)` — see trace.py. Your README needs the output.
-
-      • A handler for ModelUnavailable, so a bad key produces a message rather
-        than a stack trace. The import is already at the top of this file.
     """
     session = new_session(query, wardrobe)
 
@@ -143,6 +134,12 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
     trace.check_iterations(1)
     session["search_results"] = call_tool("search_listings", session["parsed"])
+    trace.step(
+        "search_listings (via MCP)",
+        inputs=session["parsed"],
+        returned=session["search_results"],
+        note="branch: empty, stopping" if not session["search_results"] else "",
+    )
     if not session["search_results"]:
         session["error"] = (
             "No listings matched. Try different keywords, a different size, "
@@ -153,13 +150,43 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     session["selected_item"] = session["search_results"][0]
 
     trace.check_iterations(2)
-    session["outfit_suggestion"] = suggest_outfit(
-        session["selected_item"], session["wardrobe"]
+    try:
+        session["outfit_suggestion"] = suggest_outfit(
+            session["selected_item"], session["wardrobe"]
+        )
+    except ModelUnavailable as exc:
+        session["error"] = f"Outfit suggestion failed: {exc}"
+        trace.step(
+            "suggest_outfit",
+            inputs={"item": session["selected_item"], "wardrobe": session["wardrobe"]},
+            returned=str(exc),
+            note="model unavailable; stopping",
+        )
+        return session
+    trace.step(
+        "suggest_outfit",
+        inputs={"item": session["selected_item"], "wardrobe": session["wardrobe"]},
+        returned=session["outfit_suggestion"],
     )
 
     trace.check_iterations(3)
-    session["fit_card"] = create_fit_card(
-        session["outfit_suggestion"], session["selected_item"]
+    try:
+        session["fit_card"] = create_fit_card(
+            session["outfit_suggestion"], session["selected_item"]
+        )
+    except ModelUnavailable as exc:
+        session["error"] = f"Fit-card generation failed: {exc}"
+        trace.step(
+            "create_fit_card",
+            inputs={"outfit": session["outfit_suggestion"], "item": session["selected_item"]},
+            returned=str(exc),
+            note="model unavailable; stopping",
+        )
+        return session
+    trace.step(
+        "create_fit_card",
+        inputs={"outfit": session["outfit_suggestion"], "item": session["selected_item"]},
+        returned=session["fit_card"],
     )
     return session
 
