@@ -87,14 +87,20 @@ def _short(value, limit: int = 110) -> str:
             return "[] (empty)"
         head = value[0]
         if isinstance(head, dict) and "title" in head:
-            titles = ", ".join(str(v.get("title", "?")) for v in value[:3])
+            titles = ", ".join(
+                f"{v.get('id', '?')}: {v.get('title', '?')} (${v.get('price', '?')})"
+                for v in value[:3]
+            )
             more = f" … +{len(value) - 3} more" if len(value) > 3 else ""
             return f"{len(value)} items: {titles}{more}"
         return f"{len(value)} items: {str(head)[:60]}…"
 
     if isinstance(value, dict):
         if "title" in value:
-            return f"{value.get('title')} (${value.get('price')}, {value.get('platform')})"
+            return (
+                f"{value.get('title')} (id={value.get('id')}, "
+                f"${value.get('price')}, {value.get('platform')})"
+            )
         keys = ", ".join(list(value)[:6])
         return f"dict with keys: {keys}"
 

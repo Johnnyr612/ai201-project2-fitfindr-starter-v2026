@@ -193,28 +193,73 @@ Nothing beats the character of broken-in denim, especially when it comes with th
 
 ## Run Log — Before
 
-<!-- Five criteria, five tries each, in this exact format.
-
-     Five, because your criteria are written out of five. Mark each try PASS
-     or FAIL, count the passes, and read that count against your target — a
-     row targeting 4 of 5 with three PASS cells is MISSED (3/5).
-
-     `python run_eval.py --label before` runs everything and writes the table
-     into results/. Paste it here and fill in the verdicts. -->
-
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. A matching query completes all three tools | At least 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. An impossible query stops before the second tool | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. The selected item reaches the outfit tool | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit cards include the important details | At least 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. Search respects the price ceiling | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
-**Real output from one try**, pasted as text, naming the file and function
-that produced it:
+### Criterion 1 — matching query completes all three tools
+
+Source: `run_eval.py::run_once` recorded this `agent.py::run_agent` result.
 
 ```
+- stopped early: no
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+- search_results: 10
+[1] search_listings (via MCP)
+[2] suggest_outfit
+[3] create_fit_card
+```
 
+### Criterion 2 — impossible query stops before the second tool
+
+Source: `run_eval.py::run_once` recorded this `agent.py::run_agent` result.
+
+```
+- stopped early: yes — No listings matched. Try different keywords, a different size, or a higher price limit.
+- selected_item: (none)
+- search_results: 0
+[1] search_listings (via MCP)
+      out: [] (empty)
+      →    branch: empty, stopping
+```
+
+### Criterion 3 — selected item reaches the outfit tool
+
+Source: `run_eval.py::run_once` recorded `agent.py::run_agent`; that function
+passes `session["selected_item"]` as `suggest_outfit`'s `new_item` argument.
+
+```
+[1] search_listings (via MCP)
+      out: 10 items: lst_002: Y2K Baby Tee — Butterfly Print ($18.0), lst_006: Graphic Tee — 2003 Tour Bootleg Style ($24.0), lst_033: Vintage Band Tee — Faded Grey ($19.0) … +7 more
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[2] suggest_outfit
+      in:  dict with keys: item, wardrobe
+```
+
+### Criterion 4 — fit card includes the important details
+
+Source: `run_eval.py::run_once` recorded this `tools.py::create_fit_card`
+result from `agent.py::run_agent`.
+
+```
+Channeling major early 2000s energy with this piece, perfect for throwing on with baggy dark-wash jeans and a zip hoodie for a nostalgic afternoon running errands. Grab the Y2K Baby Tee — Butterfly Print for just $18.00 over on depop before it finds a new home!
+```
+
+### Criterion 5 — search respects the price ceiling
+
+Source: `run_eval.py::run_once` recorded this `agent.py::run_agent` result;
+the search is provided by `tools.py::search_listings`.
+
+```
+- Query: butterfly under $18
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+- search_results: 1
+[1] search_listings (via MCP)
+      out: 1 items: lst_002: Y2K Baby Tee — Butterfly Print ($18.0)
 ```
 
 ---
@@ -239,15 +284,15 @@ that produced it:
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Matching query completes all three tools | At least 4 of 5 | MET (5/5) | All five runs completed without stopping early, with a selected listing, outfit suggestion, and fit card. |
+| 2 | Impossible query stops before the second tool | 5 of 5 | MET (5/5) | All five searches returned an empty list, a helpful query-change message, and a one-step trace with no outfit call. |
+| 3 | Selected item reaches the outfit tool | 5 of 5 | MET (5/5) | All five runs selected the first search result; `agent.py::run_agent` passes that same `session["selected_item"]` object directly to `suggest_outfit`. |
+| 4 | Fit cards include the important details | At least 4 of 5 | MET (5/5) | All five saved captions had 2–3 sentences and included the listing title, price, and platform once each. |
+| 5 | Search respects the price ceiling | 5 of 5 | MET (5/5) | All five runs returned one result at $18.00 for the inclusive $18 ceiling; no result exceeded it. |
 
 **Diagnoses**
 
-
+No criteria missed in this run.
 
 ---
 
