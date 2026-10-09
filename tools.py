@@ -231,10 +231,11 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
         return fallback
 
     system = (
-        "Write a natural social-media fit caption in 2 to 4 sentences, not a "
-        "product description. Mention the item's title, price, and platform "
-        "exactly once each. Describe a specific vibe, use the outfit suggestion, "
-        "and do not invent item details."
+        "Write a natural social-media fit caption in exactly 2 sentences, not "
+        "a product description. In sentence 1, use the item's exact title once "
+        "and describe its vibe. In sentence 2, use the outfit suggestion and "
+        "state the exact listed price and platform once each. Do not repeat the "
+        "title, price, or platform, and do not invent item details."
     )
     prompt = (
         f"Listing:\n{json.dumps(new_item, ensure_ascii=False, indent=2)}\n\n"
